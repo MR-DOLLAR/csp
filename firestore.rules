@@ -1,0 +1,92 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function hasRole(role) {
+      return isAuthenticated() && getUserData().role == role;
+    }
+
+    function isAdmin() {
+      return (request.auth.token.email == "revanthkumaryallanuru103@gmail.com" && request.auth.token.email_verified == true) || 
+             (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    // USERS
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // PROPOSALS
+    match /proposals/{proposalId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && (hasRole('student') || isAdmin());
+      
+      allow update: if isAuthenticated() && (
+        request.auth.uid == resource.data.studentId || 
+        hasRole('supervisor') || 
+        isAdmin()
+      );
+      
+      allow delete: if isAdmin();
+
+      // SUBCOLLECTIONS
+      match /reports/{reportId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && (hasRole('student') || isAdmin());
+      }
+
+      match /comments/{commentId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && (hasRole('supervisor') || isAdmin());
+      }
+
+      match /evaluations/{evaluationId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && (hasRole('supervisor') || isAdmin());
+      }
+    }
+
+    // NOTIFICATIONS
+    match /notifications/{id} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.userId || isAdmin());
+      allow create: if isAuthenticated() && (hasRole('supervisor') || isAdmin());
+      allow update: if isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    // MESSAGES / CHATS
+    match /messages/{chatId} {
+      allow read, write: if isAuthenticated();
+      
+      match /messages/{msgId} {
+        allow read, write: if isAuthenticated();
+      }
+    }
+
+    // DEADLINES
+    match /deadlines/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (hasRole('supervisor') || isAdmin());
+    }
+  }
+}

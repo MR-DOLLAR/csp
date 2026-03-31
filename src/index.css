@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@layer base {
+  .prose {
+    @apply text-gray-700 leading-relaxed;
+  }
+  .prose p {
+    @apply mb-4;
+  }
+  .prose ul {
+    @apply list-disc list-inside mb-4;
+  }
+  .prose h1, .prose h2, .prose h3 {
+    @apply font-bold text-gray-900 mt-6 mb-2;
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee 30s linear infinite;
+}

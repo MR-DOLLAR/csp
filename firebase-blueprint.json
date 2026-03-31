@@ -1,0 +1,110 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information including role and department.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["student", "supervisor", "admin"] },
+        "studentId": { "type": "string" },
+        "staffId": { "type": "string" },
+        "department": { "type": "string" },
+        "designation": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "profileUpdated": { "type": "boolean" }
+      },
+      "required": ["name", "email", "role"]
+    },
+    "Proposal": {
+      "title": "Proposal",
+      "description": "Project proposal details.",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "studentName": { "type": "string" },
+        "title": { "type": "string" },
+        "introduction": { "type": "string" },
+        "objectives": { "type": "array", "items": { "type": "string" } },
+        "methodology": { "type": "string" },
+        "platforms": { "type": "array", "items": { "type": "string" } },
+        "keywords": { "type": "array", "items": { "type": "string" } },
+        "references": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["draft", "submitted", "approved", "rejected"] },
+        "supervisorId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Report": {
+      "title": "Report",
+      "description": "Uploaded project reports and presentations.",
+      "type": "object",
+      "properties": {
+        "pdfUrl": { "type": "string" },
+        "pptUrl": { "type": "string" },
+        "uploadedAt": { "type": "string", "format": "date-time" },
+        "version": { "type": "integer" }
+      }
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "Feedback from supervisors.",
+      "type": "object",
+      "properties": {
+        "staffId": { "type": "string" },
+        "staffName": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Evaluation": {
+      "title": "Evaluation",
+      "description": "Grading and marks for the project.",
+      "type": "object",
+      "properties": {
+        "staffId": { "type": "string" },
+        "innovation": { "type": "integer" },
+        "implementation": { "type": "integer" },
+        "documentation": { "type": "integer" },
+        "presentation": { "type": "integer" },
+        "total": { "type": "integer" },
+        "grade": { "type": "string" },
+        "remarks": { "type": "string" },
+        "evaluatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "In-app notifications for users.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "message": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Deadline": {
+      "title": "Deadline",
+      "description": "Project deadlines set by admin or supervisor.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "dueDate": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" },
+        "target": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": { "schema": "User", "description": "User profiles" },
+    "/proposals/{proposalId}": { "schema": "Proposal", "description": "Project proposals" },
+    "/proposals/{proposalId}/reports/{reportId}": { "schema": "Report", "description": "Proposal reports" },
+    "/proposals/{proposalId}/comments/{commentId}": { "schema": "Comment", "description": "Supervisor comments" },
+    "/proposals/{proposalId}/evaluations/{evaluationId}": { "schema": "Evaluation", "description": "Project evaluations" },
+    "/notifications/{notificationId}": { "schema": "Notification", "description": "User notifications" },
+    "/deadlines/{deadlineId}": { "schema": "Deadline", "description": "System deadlines" }
+  }
+}
